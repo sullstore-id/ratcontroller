@@ -6,6 +6,7 @@ plugins {
 
 android {
     compileSdk 33
+    namespace 'com.tumbal.rat'
 
     defaultConfig {
         applicationId "com.tumbal.rat"
