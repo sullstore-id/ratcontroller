@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "21085514455",
+    "project_id": "ratcontroller-adad5",
+    "storage_bucket": "ratcontroller-adad5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21085514455:android:ad188b61c61e4fc68dde92",
+        "android_client_info": {
+          "package_name": "com.tumbal.rat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVHj9l4NU0qXJbv6xzXlMN2ODfvM-KMt0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
